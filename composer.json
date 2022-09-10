@@ -1,0 +1,20 @@
+{
+    "name": "alias/petit-projet-calendrier",
+    "autoload": {
+        "psr-4": {
+            "Alias\\PetitProjetCalendrier\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Thealiasfmr",
+            "email": "robin.graffin@gmail.com"
+        }
+    ],
+    "autolaoad": {
+        "psr-4": {
+            "Calendar\\": "src/Calendar"
+        }
+    },
+    "require": {}
+}

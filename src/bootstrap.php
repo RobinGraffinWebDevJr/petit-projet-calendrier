@@ -1,9 +1,11 @@
 <?php
+require './vendor/autoload.php';
 
 function e404 () {
     require './public/404.php';
     exit();
 }
+
 function dd(...$vars) {
     foreach($vars as $var) {
         echo '<pre>';
@@ -24,4 +26,9 @@ function h(?string $value): string {
         return '';
     }
     return htmlentities($value);
+}
+
+function render(string $view, $parameters = []) {
+    extract($parameters);
+    include "./views/{$view}.php";
 }

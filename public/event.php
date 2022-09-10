@@ -1,6 +1,5 @@
 <?php 
     require './src/bootstrap.php';
-    require './src/Calendar/Events.php';
     $pdo = get_pdo();
     $events = new Calendar\Events($pdo);
     if (!isset($_GET['id'])) {
@@ -11,7 +10,8 @@
     } catch (\Exception $e) {
         e404();
     }
-    require './views/header.php';
+    
+    render('header', ['title' => $event->getName()]);
 ?>
     
     <h1><?= h($event->getName); ?></h1>

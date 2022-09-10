@@ -1,8 +1,7 @@
     <?php 
     require './src/bootstrap.php';
-    require './src/Calendar/Month.php';
-    require './src/Calendar/Events.php';
-    $pdo = get_pdo();
+
+        $pdo = get_pdo();
         $events = new Calendar\Events($pdo);
         $month = new Calendar\Month($_GET['month'] ?? null, $_GET['year'] ?? null); 
         $start = $month->getStartingDay();
@@ -12,7 +11,9 @@
         $events = $events->getEventsBetweenByDay($start, $end);
     require './views/header.php';
 ?>
-    <div class="d-flex flex-row align-items-center justify-content-between mx-sm-3">
+
+   <div class="calendar">
+   <div class="d-flex flex-row align-items-center justify-content-between mx-sm-3">
    <h1><?= $month->toString(); ?></h1>
    <div>
     <a href="/index.php?month=<?= $month->previousMonth()->month; ?>&year=<?= $month->previousMonth()->year; ?>" class="btn btn-primary">&lt;</a>
@@ -20,6 +21,7 @@
    </div>
     </div>
 
+    
     <table class="calendar__table calendar__table--<?= $weeks; ?>weeks">
     <?php for ($i = 0; $i < $weeks; $i++): ?>
         <tr>
@@ -34,14 +36,18 @@
                 <?php endif; ?>
                <div class="calendar__day"><?= $date->format('d'); ?></div>
                <?php foreach($eventsForDay as $event): ?>
-                <div class="calendar__event"></div>
+                <div class="calendar__event">
                 <?= (new Datetime($event['start']))->format('H:i') ?> - <a href="/event.php?id=<?= $event['id']; 
                 ?>"> <?= h($event['name']); ?></a>
+                </div>
                 <?php endforeach; ?>
             </td>
             <?php endforeach; ?>
         </tr>
     <?php endfor; ?>
     </table>
+    
+    <a href="/add.php" class="calendar__button">+</a>
+   </div>
 
     <?php require './views/footer.php'; ?>
