@@ -13,6 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <div class="container">
+
+<?php if (!empty($errors)): ?>
+    <div class="alert alert-danger">
+        Merci de corriger vos erreurs
+    </div>
+<?php endif; ?>
+
     <h1>Ajouter un évènement</h1>
     <form action="" method="post" class="form">
         <div class="row">
@@ -20,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-group">
                     <label for="name">Titre</label>
                     <input id="name" type="text" required class="form-control" name="name" value="Demo">
-                    <?php if ($errors['name']): ?>
+                    <?php if (isset($errors['name'])): ?>
                         <p class="help-block"><?= $errors['name']; ?></p>
                         <?php endif; ?>
                 </div>
