@@ -1,4 +1,4 @@
-<?php
+Interf<?php
 namespace Calendar;
 
 class Event {
@@ -26,11 +26,27 @@ class Event {
         return $this->description ?? '';
     }
 
-    public function getStart (): \DateTime {
-        return new \DateTime($this->start);
+    public function getStart (): \DateTimeInterface {
+        return new \DateTimeImmutable($this->start);
     }
 
-    public function getEnd (): \DateTime {
-        return new \DateTime($this->end);
+    public function getEnd (): \DateTimeInterface {
+        return new \DateTimeImmutable($this->end);
+    }
+
+    public function setName (string $name) {
+        $this->name = $name;
+    }
+
+    public function setDescription (string $descritpion) {
+        $this->descritpion = $descritpion;
+    }
+
+    public function setStart (string $start) {
+        $this->start = $start;
+    }
+
+    public function setEnd (string $end) {
+        $this->end = $end;
     }
 }

@@ -17,23 +17,24 @@ class Events {
      * @return array
      */
     public function getEventsBetween (\DateTime $start, \DateTime $end): array {
-        $sql = "SELECT * FROM events WHERE start BETWEEN '{$start->format('Y-m-d 00:00:00')}' AND '{$end->format('Y-m-d 23:59:59')}'";
+        $sql = "SELECT * FROM events WHERE start BETWEEN '{$start->format('Y-m-d 00:00:00')}' AND '{$end->format('Y-m-d 23:59:59')}' ORDER BY start ASC";
         $statement = $this->pdo->query($sql);
+        $statement->setFetchMode(\PDO::FETCH_CLASS, Event::class);
         $results = $statement->fetchAll();
         return $results;
     }
 
     /**
      * Récupère les évènements commençant entre deux dates indexé par jopur
-     * @param \DateTime $start
-     * @param \DateTime $end
+     * @param \DateTimeInterface $start
+     * @param \DateTimeInterface $end
      * @return array
      */
-    public function getEventsBetweenByDay (\DateTime $start, \DateTime $end): array {
+    public function getEventsBetweenByDay (\DateTimeInterface $start, \DateTimeInterface $end): array {
         $events = $this->getEventsBetween($start, $end);
         $days = [];
         foreach($events as $event) {
-            $date = explode(' ', $event['start'])[0];
+            $date = $event->getStart()->format('Y-m-d');
             if (!isset($days[$date])) {
                 $days[$date] = [$event];
             } else {
@@ -57,8 +58,56 @@ class Events {
             throw new \Exception('Aucun résultat n\'a été trouvé');
         }
         return $result;
-
     }
+
+    public function hydrate (Event $event, array $data) {
+        $event->setName($data['name']);
+        $event->setDescription($data['description']);
+        $event->setStart(\DateTimeImmutable::createFromFormat(  'y-m-d H:i', $data['date'] . ' ' . $data['start'])
+    ->format('Y-m-d H:i:s'));
+        $event->setEnd(\DateTimeimmutable::createFromFormat('y-m-d H:i', $data['date'] . ' ' . $data['end'])
+    ->format('Y-m-d H:i:s'));
+        return $event;
+    }
+
+    /**
+     * Crée un évènement au niveau de la base de donnée
+     * @param Event $event
+     * @return bool
+     */
+    public function create (Event $event): bool {
+        $statement = $this->pdo->prepare('INSERT INTO events (name, description, start, end) VALUES (?, ?, ?, ?)');
+        return $statement->execute([
+            $event->getName(),
+            $event->getDescription(),
+            $event->getStart()->format('Y-m-d H:i:s'),
+            $event->getEnd()->format('Y-m-d H:i:s'),
+        ]);
+    }
+    
+    /**
+     * Met a jour un évènement au niveau de la base de donnée
+     * @param Event $event
+     * @return bool
+     */
+    public function update (Event $event): bool {
+        $statement = $this->pdo->prepare('UPDATE events SET name =  ?, description = ?, start = ?, end = ? WHERE id = ?');
+        return $statement->execute([
+            $event->getName(),
+            $event->getDescription(),
+            $event->getStart()->format('Y-m-d H:i:s'),
+            $event->getEnd()->format('Y-m-d H:i:s'),
+            $event->getId()
+        ]);
+    }
+
+    /**
+     * TODO: Supprime un evenement
+     * @param Event $event
+     * @return bool
+     */
+    public function delete(Event $event): bool
+
 
 }
 

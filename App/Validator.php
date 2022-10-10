@@ -6,6 +6,11 @@ class Validator {
     private $data;
     protected $errors = [];
 
+    public function __constructor(array $data = [])
+    {
+        $this->data = $data;
+    }
+
 
     /**
      * @param array $data
@@ -14,13 +19,15 @@ class Validator {
     public function validates(array $data) {
         $this->errors = [];
         $this->data = $data;
+        return $this->errors;
     }
 
-    public function validate(string $field, string $method, ...$parameters) {
+    public function validate(string $field, string $method, ...$parameters): bool {
         if (!isset($this->data[$field])) {
             $this->errors[$field] = "Le champs $field n'est pas rempli";
+            return false;
         } else {
-            call_user_func([$this, $method], $field, ...$parameters);
+            return call_user_func([$this, $method], $field, ...$parameters);
         }
     }
 
@@ -58,7 +65,7 @@ class Validator {
             }
             return true;
         }
-        return false;
+        return false; 
     }
     
 }

@@ -7,14 +7,23 @@
         $start = $month->getStartingDay();
         $start = $start->format('N') === '1' ? $start : $month->getStartingDay()->modify('last monday');
         $weeks = $month->getWeeks();
-        $end = (clone $start)->modify('+' . (6 + 7 * ($weeks -1)) . ' days');
+        $end =  $start->modify('+' . (6 + 7 * ($weeks -1)) . ' days');
         $events = $events->getEventsBetweenByDay($start, $end);
     require './views/header.php';
 ?>
 
    <div class="calendar">
+
    <div class="d-flex flex-row align-items-center justify-content-between mx-sm-3">
    <h1><?= $month->toString(); ?></h1>
+
+   <?php if (isset($_GET['success'])): ?>
+   <div class="container">
+   <div class="alert alert-success">
+        L'évenement a bien ete enregistrer
+    </div>
+   </div>
+    <?php endif; ?>
    <div>
     <a href="/index.php?month=<?= $month->previousMonth()->month; ?>&year=<?= $month->previousMonth()->year; ?>" class="btn btn-primary">&lt;</a>
     <a href="/index.php?month=<?= $month->nextMonth()->month; ?>&year=<?= $month->nextMonth()->year; ?>" class="btn btn-primary">&gt;</a>
@@ -27,18 +36,19 @@
         <tr>
             <?php 
             foreach($month->days as $k => $day): 
-               $date = (clone $start)->modify("+" . ($k + $i * 7) . " days");
+               $date =  $start->modify("+" . ($k + $i * 7) . " days");
                $eventsForDay = $events[$date->format('Y-m-d')] ?? [];
+               $isToday = date('Y-m-d') === $date->format('Y-m-d');
                 ?>
-            <td class="<?= $month->withinMonth($date) ? '' : 'calendar__othermonth'; ?>">
+            <td class="<?= $month->withinMonth($date) ? '' : 'calendar__othermonth'; ?> <?= $isToday ? '' : 'is-today'; ?>">
                <?php if ($i === 0): ?>
                 <div class="calendar__weekday"><?= $day; ?></div>
                 <?php endif; ?>
-               <div class="calendar__day"><?= $date->format('d'); ?></div>
+               <a class="calendar__day" href="add.php?date="><?= $date->format('Y-m-d'); ?></a>
                <?php foreach($eventsForDay as $event): ?>
                 <div class="calendar__event">
-                <?= (new Datetime($event['start']))->format('H:i') ?> - <a href="/event.php?id=<?= $event['id']; 
-                ?>"> <?= h($event['name']); ?></a>
+                <?= $event->getStart()->format('H:i') ?> - <a href="/edit.php?id=<?= $event->getID();  
+                ?>"> <?= h($event->getName()); ?></a>
                 </div>
                 <?php endforeach; ?>
             </td>

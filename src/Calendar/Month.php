@@ -32,13 +32,14 @@ class Month {
      * Renvoie le 1er jour du mois
      * @return \Datetime
      */
-    public function getStartingDay (): \Datetime {
-       return new \Datetime("{$this->year}-{$this->month}-01");
+    public function getStartingDay (): \DatetimeInterface {
+       return new \DatetimeImmutable("{$this->year}-{$this->month}-01");
     }
 
     /**
      * Retourne le mois en toute lettre (ex: Mars 2022)
      * @return string
+     * @throws \Exception
      */
     public function toString (): string {
         return $this->months[$this->month - 1] . ' ' . $this->year;
@@ -51,8 +52,13 @@ class Month {
      */
     public function getWeeks(): int {
         $start = $this->getStartingDay();
-        $end = (clone $start)->modify('+1 month -1 day');
-        $weeks = intval($end->format('W')) - intval($start->format('W')) + 1;
+        $end =  $start->modify('+1 month -1 day');
+        $startWeek = intval($start->format('W'))
+        $endWeek = intval($end->format('W'))
+        if ($endWeek === 1) {
+            $endWeek =  intval($end->modify('-7 days')->format('W')) + 1;
+        }
+        $weeks = $endWeek - $startWeek + 1;
         if ($weeks < 0) {
             $weeks = intval($end->format('W'));
         }
@@ -62,10 +68,11 @@ class Month {
 
     /**
      * Est-ce que le jour est dans le mois en cours
-     * @param \Datetime $date
+     * @param \DatetimeInterface $date
      * @return bool
+     * @throws \Exception
      */
-    public function withinMonth (\Datetime $date): bool {
+    public function withinMonth (\DatetimeInterface $date): bool {
         return $this->getStartingDay()->format('Y-m') === $date->format('Y-m');
     }
 
